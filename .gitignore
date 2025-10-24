@@ -1,5 +1,5 @@
 # secrets（パスワード・認証情報）
-secrets/
+# secrets/
 
 # 環境変数ファイル（個人設定）
 .env.local
