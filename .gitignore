@@ -1,0 +1,19 @@
+# secrets（パスワード・認証情報）
+secrets/
+
+# 環境変数ファイル（個人設定）
+.env.local
+.env.test
+
+# ボリュームや永続化データ
+/home/*/data/
+data/
+var/lib/mysql/
+var/www/html/
+
+# OS・IDE
+.DS_Store
+.vscode/
+.idea/
+*.log
+*.bak

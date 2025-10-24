@@ -1,0 +1,62 @@
+services:
+  nginx:
+    build: ./requirements/nginx
+    ports:
+      - "443:443"
+    depends_on:
+      - wordpress
+    networks: [inception]
+    restart: unless-stopped
+    volumes:
+      - wp-data:/var/www/html:ro
+
+  wordpress:
+    build: ./requirements/wordpress
+    depends_on:
+      - mariadb
+    networks: [inception]
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - wp-data:/var/www/html
+    secrets:
+      - db_password
+
+  mariadb:
+    build:
+      context: ./requirements
+      dockerfile: mariadb/Dockerfile
+    networks: [inception]
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    volumes:
+      - db-data:/var/lib/mysql
+    secrets:
+      - db_password
+      - db_root_password
+
+networks:
+  inception:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
+    driver_opts: { type: none, device: "/home/${LOGIN}/data/db", o: bind }
+  wp-data:
+    driver: local
+    driver_opts: { type: none, device: "/home/${LOGIN}/data/wordpress", o: bind }
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
