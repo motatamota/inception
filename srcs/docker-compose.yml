@@ -1,6 +1,10 @@
 services:
   nginx:
-    build: ./requirements/nginx
+    build:
+      context: ./requirements
+      dockerfile: nginx/Dockerfile
+      args:
+        DOMAIN_NAME: ${DOMAIN_NAME}
     ports:
       - "443:443"
     depends_on:
@@ -11,7 +15,9 @@ services:
       - wp-data:/var/www/html:ro
 
   wordpress:
-    build: ./requirements/wordpress
+    build:
+      context: ./requirements
+      dockerfile: wordpress/Dockerfile
     depends_on:
       - mariadb
     networks: [inception]

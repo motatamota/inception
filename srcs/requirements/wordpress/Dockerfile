@@ -1,10 +1,9 @@
-FROM debian:11.11
+FROM debian:bullseye
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && \
     apt-get install -y php-fpm php-mysql curl wget tar && \
-	# キャッシュ削除
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
@@ -12,15 +11,16 @@ RUN curl -O https://ja.wordpress.org/latest-ja.tar.gz && \
     tar -xzf latest-ja.tar.gz --strip-components=1 && \
     rm latest-ja.tar.gz
 
-COPY ./mariadb/conf/my.cnf /etc/mysql/my.cnf
-COPY ./tools/setup.sh /usr/local/bin/
+COPY ./tools/setup_wp.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/setup_wp.sh
 
-RUN chmod +x /usr/local/bin/setup.sh
+COPY ./wordpress/conf/wp-config.php /var/www/html/wp-config.php
+COPY ./wordpress/conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
-VOLUME ["/var/lib/mysql"]
+RUN mkdir -p /run/php && chown -R www-data:www-data /var/www/html
 
-EXPOSE 3306
+EXPOSE 9000
+VOLUME ["/var/www/html"]
 
-ENTRYPOINT ["/usr/local/bin/setup.sh"]
-
-CMD ["mysqld_safe"]
+ENTRYPOINT ["/usr/local/bin/setup_wp.sh"]
+CMD ["php-fpm7.4", "-F"]

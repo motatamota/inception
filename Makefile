@@ -1,21 +1,31 @@
 NAME = inception
+COMPOSE = docker-compose -f srcs/docker-compose.yml
 
 all: up
 
 up:
-	docker-compose -f srcs/docker-compose.yml up --build -d
+	$(COMPOSE) up --build -d
+
+up-foreground:
+	$(COMPOSE) up --build
+
+logs:
+	$(COMPOSE) logs -f
+
+log_%:
+	$(COMPOSE) logs -f $*
 
 down:
-	docker-compose -f srcs/docker-compose.yml down
+	$(COMPOSE) down
 
 mariadb:
-	docker-compose -f srcs/docker-compose.yml up -d mariadb
+	$(COMPOSE) up -d mariadb
 
 nginx:
-	docker-compose -f srcs/docker-compose.yml up -d nginx
+	$(COMPOSE) up -d nginx
 
 wordpress:
-	docker-compose -f srcs/docker-compose.yml up -d wordpress
+	$(COMPOSE) up -d wordpress
 
 clean: down
 	docker system prune -af
@@ -25,4 +35,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all up down clean fclean re
+.PHONY: all up up-foreground logs log_% down clean fclean re mariadb nginx wordpress

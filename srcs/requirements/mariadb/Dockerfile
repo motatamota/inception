@@ -16,6 +16,6 @@ VOLUME ["/var/lib/mysql"]
 
 EXPOSE 3306
 
-ENTRYPOINT ["/usr/local/bin/setup.sh"]
+ENTRYPOINT ["/usr/local/bin/setup_mariadb.sh"]
 
 CMD ["mysqld_safe"]
